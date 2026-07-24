@@ -27,7 +27,7 @@ from torch.utils.data import DataLoader
 
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))
-from data import LiberoGoalPairs, load_libero_spatial  # noqa: E402
+from data import LiberoGoalPairs, load_libero  # noqa: E402
 
 MODEL_ID = "timbrooks/instruct-pix2pix"
 VAE_SCALE = 0.18215
@@ -45,6 +45,9 @@ def main():
     ap.add_argument("--save_every", type=int, default=2000)
     ap.add_argument("--out", type=str, default=str(_HERE / "ckpt"))
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--suites", type=str, default="libero_spatial",
+                    help="comma-separated LIBERO suites")
+    ap.add_argument("--max_demos", type=int, default=None)
     args = ap.parse_args()
 
     torch.backends.cuda.matmul.allow_tf32 = True
@@ -77,7 +80,10 @@ def main():
                           truncation=True, return_tensors="pt").input_ids.to(device)
         empty_emb = text_encoder(empty)[0].to(torch.bfloat16)  # [1,77,768]
 
-    tasks = load_libero_spatial()
+    suites = tuple(s.strip() for s in args.suites.split(",") if s.strip())
+    print(f"[data] loading suites: {suites}", flush=True)
+    tasks = load_libero(suites, max_demos=args.max_demos)
+    print(f"[data] {len(tasks)} tasks, {sum(len(t['demos']) for t in tasks)} demos", flush=True)
     ds = LiberoGoalPairs(tasks, split="train", offset_min=args.offset_min,
                          offset_max=args.offset_max, size=args.size,
                          length=args.steps * args.batch)

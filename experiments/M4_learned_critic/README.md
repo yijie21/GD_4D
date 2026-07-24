@@ -81,12 +81,51 @@ within-scene wrong objects (patch 0.97), and generalizes across suites (0.75–0
 S4-supervised head on D1 appearance features. Geometry supplies nothing here; the frozen backbone's
 role is dream-conditioning for the policy.
 
-### Open (honest scope)
-- OOD to genuinely **novel objects** transfers less (0.75) — needs broader training suites or DINOv3.
-- Negatives are S2 **synthetic** corruptions; a direct test on a diverse real dreamer's within-scene
-  errors is still ideal (blocked by the low-diversity libero_spatial dreamer — retrain the dreamer on
-  all 4 suites to close this).
-- Next: swap DINOv2→DINOv3 (D1), fold the critic into the S4 head, wire `Dₜ` into the policy gate.
+## v3 — real dreamer errors: two error types, and what the critic catches
+
+To close the "synthetic-corruption gap", retrained the dreamer on all **4 suites** (`ckpt_4suite`,
+loss 0.07→0.026) and generated, per held-out obs, `dream_correct` (right instruction) vs `dream_wrong`
+(a different suite's instruction → a coherent goal for the WRONG task). `gen_correct_wrong.py`,
+`dream_critic_test.py`.
+
+**Finding 0 — the IP2P dreamer is weakly instruction-conditioned.** At the default guidance
+(7.5 / img 1.5) a wrong instruction changed the goal only ~6 px; only at **guidance 12 / img 1.0** did
+it follow the instruction (~28 px, coherent goal change). A stronger goal-diffusion dreamer would help.
+
+**Finding 1 — an appearance critic cannot detect instruction-mismatch dreams.**
+| test | AUROC |
+|---|---|
+| correct-vs-wrong dream, in-distribution ceiling (appearance) | **0.607** |
+| … + instruction (CLIP text) | 0.574 |
+| … cross-suite OOD (appearance) | 0.520 |
+| … + instruction, OOD | 0.522 |
+| transfer from cheap real-frame critic | 0.517 |
+
+Near chance, and the instruction (pooled CLIP text, concat+MLP) does not help — telling two *plausible*
+goals apart by task-correctness needs proper **vision-language grounding** (cross-attention VLM), not an
+appearance-feature MLP.
+
+### The taxonomy this reveals (the real result)
+Dream errors are **two distinct kinds**:
+1. **Geometric / localized** — wrong object position, physically implausible, artifacts. What a dreamer
+   produces when imperfectly executing the *right* task. **The patch critic catches these: v2 = 0.97**
+   (cross-suite 0.75–0.99). S2 synthetic corruptions are a faithful proxy → the gap for THIS type is
+   closed, and it is the **deployment-relevant** mode (a well-conditioned dreamer does the right task
+   imperfectly).
+2. **Semantic instruction-mismatch** — a coherent, plausible goal for the *wrong* task. Appearance
+   critics can't detect it (ceiling ~0.61); needs a **VLM verifier**. Lower priority: a dreamer
+   conditioned on the correct instruction won't spontaneously switch tasks.
+
+### Verdict for the `Dₜ` head
+- **Primary `Dₜ` = learned patch critic on appearance features** (v2, 0.97) — catches the
+  deployment-relevant geometric/localized dream errors. ✓
+- **Optional/future**: a VLM verifier for semantic instruction-mismatch (harder, lower priority).
+- **Dreamer**: needs stronger instruction conditioning (guidance) or a better goal-diffusion model.
+
+### Open
+- Novel-object OOD (v2 `libero_object` 0.75) — broader suites (libero_90) / DINOv3.
+- A VLM-verifier de-risk for the semantic-mismatch error type (separate, larger effort).
+- Next: DINOv2→DINOv3 (D1), fold the patch critic into the S4 head, wire `Dₜ` into the policy gate.
 
 ## Reproduce (env `gd4d5090`, GPU0)
 ```bash

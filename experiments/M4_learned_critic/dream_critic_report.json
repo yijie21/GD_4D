@@ -1,0 +1,19 @@
+{
+  "n_items": 80,
+  "q3a_ceiling_ood": {
+    "libero_spatial": 0.487,
+    "libero_object": 0.665,
+    "libero_goal": 0.555,
+    "libero_10": 0.45
+  },
+  "q3a_indist_appearance": 0.607,
+  "q3a_indist_instruction": 0.574,
+  "q3b_transfer_auroc": 0.517,
+  "q3b_correct_preferred": 0.475,
+  "q3c_with_instruction_ood": {
+    "libero_spatial": 0.435,
+    "libero_object": 0.62,
+    "libero_goal": 0.542,
+    "libero_10": 0.472
+  }
+}

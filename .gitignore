@@ -42,4 +42,4 @@ experiments/**/gallery.html
 .DS_Store
 
 # M2 dreamer fine-tuned weights (large; reproducible via train.py)
-experiments/*/ckpt/
+experiments/*/ckpt*/

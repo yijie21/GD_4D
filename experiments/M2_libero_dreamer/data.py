@@ -54,12 +54,22 @@ def load_libero_spatial(cam: str = "agentview_rgb", root: Path = LIBERO_ROOT):
 
     Returns list of dicts: {task, instruction, demos: list[np.uint8 [T,H,W,3]]}.
     """
-    suite_dir = root / "libero_spatial"
-    files = sorted(suite_dir.glob("*.hdf5"))
+    return load_libero(("libero_spatial",), cam=cam, root=root)
+
+
+def load_libero(suites=("libero_spatial",), cam: str = "agentview_rgb",
+                root: Path = LIBERO_ROOT, max_demos: int | None = None):
+    """Preload one or more LIBERO suites.
+
+    Returns list of dicts: {task, suite, instruction, demos: list[np.uint8 [T,H,W,3]]}.
+    """
     tasks = []
-    for hp in files:
-        demos, instr = _load_task(hp, cam)
-        tasks.append({"task": hp.stem, "instruction": instr, "demos": demos})
+    for suite in suites:
+        for hp in sorted((root / suite).glob("*.hdf5")):
+            demos, instr = _load_task(hp, cam)
+            if max_demos is not None:
+                demos = demos[:max_demos]
+            tasks.append({"task": hp.stem, "suite": suite, "instruction": instr, "demos": demos})
     return tasks
 
 

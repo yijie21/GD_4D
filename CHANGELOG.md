@@ -9,7 +9,26 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **✅ M4 v2 + pipeline figure: the real Dₜ head (per-patch critic) catches within-scene errors and generalizes.** _(HEAD — this change)_
+- **M4 v3: real dreamer errors split into two types — the deployment-relevant one is caught, the other needs a VLM.** _(HEAD — this change)_
+  - Retrained the dreamer on all 4 suites (`ckpt_4suite`); generated `dream_correct` (right instruction)
+    vs `dream_wrong` (a different suite's instruction → a coherent goal for the WRONG task).
+    `gen_correct_wrong.py`, `dream_critic_test.py`.
+  - **Finding 0:** the IP2P dreamer is weakly instruction-conditioned — a wrong instruction changed the
+    goal only ~6 px at default guidance; needed guidance 12 / img-guid 1.0 to follow it (~28 px).
+  - **Finding 1:** an appearance critic (± pooled CLIP-text instruction) CANNOT separate correct-vs-wrong
+    dreams — in-distribution ceiling **0.61** (appearance) / 0.57 (+instruction), cross-suite OOD ~0.52,
+    transfer 0.52. Distinguishing two *plausible* goals by task-correctness needs vision-language
+    grounding (a VLM), not an appearance-feature MLP.
+  - **⇒ Dream errors are two kinds:** (1) **geometric/localized** (wrong object pose, artifacts) — what a
+    dreamer doing the RIGHT task imperfectly produces — **caught by the patch critic (v2 0.97)** and the
+    deployment-relevant mode (S2 corruptions are a faithful proxy → that gap is closed); (2) **semantic
+    instruction-mismatch** — a coherent goal for the wrong task — needs a **VLM verifier**, lower priority.
+  - **Primary `Dₜ` = the patch appearance critic (validated); VLM verifier = optional/future.** Dreamer
+    needs stronger instruction conditioning.
+  - Files: `experiments/M4_learned_critic/dream_critic_test.py`, `experiments/M2_libero_dreamer/gen_correct_wrong.py`,
+    `experiments/M2_libero_dreamer/data.py` + `train.py` (4-suite loader), `GD-4D_implementation_plan.md`.
+
+- **✅ M4 v2 + pipeline figure: the real Dₜ head (per-patch critic) catches within-scene errors and generalizes.** `24d195d`
   - Downloaded 4 LIBERO suites (spatial/object/goal/10). Built the plan's S4-supervised head on DINOv2
     **patch** features (`critic_v2_patch.py`): S2 relocate/remove/tps corruptions as within-scene wrong
     negatives (SAM2 masks, 16×16 labels); clean goals all-0 so the critic must separate a corruption-
