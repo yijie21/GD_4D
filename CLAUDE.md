@@ -70,6 +70,17 @@ src/
 
 ---
 
+## 2.5 Change tracing (MANDATORY)
+
+**Every time something updates — code, vendored deps, checkpoints, configs — append an entry
+to `CHANGELOG.md` at the repo root, in the same change.** Record the exact change so it can be
+traced later:
+
+- **date**, **what changed** (files / dirs), **why**, and the **git commit** (short hash) if committed.
+- Keep newest entries at the top. This is a human-readable trace that complements `git log`.
+
+Do not land a change without a corresponding `CHANGELOG.md` entry.
+
 ## 3. Open blocker before coding the bridge
 
 **Decision D0 (which 4D backbone) is unresolved and gates milestone M1 (and everything after).**
