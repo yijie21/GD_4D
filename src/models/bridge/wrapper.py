@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import torch
 import torch.nn as nn
+from torch.utils.checkpoint import checkpoint
 
 from .attention import LoRAAttention
 from .imagined_time import ImaginedTimeEmbedding
@@ -37,6 +38,7 @@ class D4RTBridge(nn.Module):
             blk.attn = LoRAAttention.from_mha(blk.attn, rank=rank, alpha=alpha)  # trainable A/B added
             self.attns.append(blk.attn)
         self.imagined_time = ImaginedTimeEmbedding(enc.hidden_dim)
+        self.use_checkpoint = False                        # gradient checkpointing (set True for training)
         self.to(next(self.model.parameters()).device)     # new LoRA/imag-time modules → backbone device
         self.set_mode("student")
 
@@ -88,7 +90,9 @@ class D4RTBridge(nn.Module):
 
         student = self.mode == "student"
         if student and dream_j is not None:                # add imagined-time to the dream tokens only
-            j = torch.full((b,), float(dream_j), device=tokens.device)
+            j = torch.as_tensor(dream_j, dtype=torch.float32, device=tokens.device).reshape(-1)
+            if j.numel() == 1:
+                j = j.expand(b)                            # scalar → per-sample [B]
             mask = torch.zeros(b, N, 1, device=tokens.device, dtype=tokens.dtype)
             mask[:, dream_start:, :] = 1.0
             tokens = tokens + mask * self.imagined_time(j).to(tokens.dtype)[:, None, :]
@@ -100,17 +104,19 @@ class D4RTBridge(nn.Module):
             g_global = (g_vid if extra is None else
                         torch.cat([g_vid, torch.zeros(b, extra.shape[1], 1, device=tokens.device, dtype=tokens.dtype)], 1))
 
+        ckpt = self.use_checkpoint and torch.is_grad_enabled()
+        run = (lambda blk, t: checkpoint(blk, t, use_reentrant=False)) if ckpt else (lambda blk, t: blk(t))
         extra_tokens = extra
         for mode, block in zip(enc.block_modes, enc.blocks):
             block.attn.set_gate((g_local if mode == "local" else g_global) if student else None)
             if mode == "local":
                 loc = tokens.reshape(b, tp, spatial, c).reshape(b * tp, spatial, c)
-                loc = block(loc)
+                loc = run(block, loc)
                 tokens = loc.reshape(b, tp, spatial, c).reshape(b, N, c)
             elif extra_tokens is None:
-                tokens = block(tokens)
+                tokens = run(block, tokens)
             else:
-                merged = block(torch.cat([tokens, extra_tokens], dim=1))
+                merged = run(block, torch.cat([tokens, extra_tokens], dim=1))
                 tokens, extra_tokens = merged[:, :N], merged[:, N:]
 
         encoded = tokens if extra_tokens is None else torch.cat([tokens, extra_tokens], dim=1)

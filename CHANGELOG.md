@@ -9,7 +9,18 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **M1: wired imagined-time + dream-token gating into the bridge (identity preserved).** _(HEAD — this change)_
+- **M1: full distillation run (bidirectional + all offsets + checkpointing) — machinery complete, gate not yet passed.** _(HEAD — this change)_
+  - `distill.py` rewritten: bidirectional queries (o_t↔dream), dreams at all offsets j∈{5,10,15,20},
+    per-sample `dream_j`, held-out **recall@3px** eval (the acceptance metric). `wrapper.py` gained
+    **gradient checkpointing** (`use_checkpoint`) — fixed a GPU0 OOM (grads flow to LoRA through the whole
+    1.16 B backbone). GPU0 only.
+  - First run (40 train/12 held-out, 150 steps): held-out recall@3px **0.91→0.91 fwd, 0.89→0.90 bwd** —
+    **below the 0.95 gate**. Train loss 0.16→0.027 but held-out flat → overfitting + the untrained student
+    is already ~0.91 (backbone natively handles obs+dream). Honest result recorded; decision needed
+    (scale / refine metric / revisit bridge value). `experiments/M1_bridge_distill/` (recall figure).
+  - Files: `src/train/distill.py`, `src/models/bridge/wrapper.py`, `experiments/M1_bridge_distill/README.md`, `GD-4D_implementation_plan.md`.
+
+- **M1: wired imagined-time + dream-token gating into the bridge (identity preserved).** `3dd5fe6`
   - `wrapper.py::encode_video` is now a **bridge-controlled re-implementation of the encoder forward**
     (mirrors the vendored one; **identity smoke still 0.00e0**). In student mode it adds the imagined-time
     embedding to the dream tokens and **gates** each block's LoRA delta to the dream's **last temporal
