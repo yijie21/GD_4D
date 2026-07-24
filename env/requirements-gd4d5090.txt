@@ -20,3 +20,7 @@ numpy==2.2.6
 huggingface_hub[cli]
 h5py
 pytest
+
+# SAM 2 (masks for S2 corruptions) — editable install from the vendored clone (pulls hydra-core, iopath, omegaconf):
+#   TMPDIR=/workspace/tmp pip install --no-build-isolation -e third_party/sam2
+# (use --no-build-isolation so it reuses the env's torch instead of re-downloading it onto the tiny overlay /)

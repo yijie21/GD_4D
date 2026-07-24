@@ -8,6 +8,7 @@ Contents are git-ignored; record every clone below so it is reproducible.
 | Repo (URL) | Commit | Used for | Date |
 |------------|--------|----------|------|
 | https://github.com/Lijiaxin0111/Open-d4rt.git | `bead824` | **D4RT-style 4D reconstruction backbone** (inventory component #1) — resolves Decision D0. Model at `src/model/` (`d4rt.py`, `encoder.py`, `decoder.py`, `query_embedding.py`, `heads.py`); the queryable interface the M1 bridge wraps. | 2026-07-24 |
+| https://github.com/facebookresearch/sam2.git | `2b90b9f` | **SAM 2** (inventory #6) — object masks for S2 corruptions (cut-paste, composite). `pip install -e third_party/sam2` into `gd4d5090`; weights in `checkpoints/sam2/`. Apache-2.0. | 2026-07-24 |
 
 Notes:
 - Vendored from local copy `/workspace/code/Open-d4rt` (its `.git` removed here; commit recorded above).

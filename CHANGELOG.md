@@ -9,7 +9,18 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **M0/S1 finish: real LIBERO dataset adapter — S1 now builds tuples from real pixels.** _(HEAD — this change)_
+- **S2 setup: pulled SAM 2 (masks) + reshaped S2 to cheap negatives (no diffusion editor).** _(HEAD — this change)_
+  - Vendored `facebookresearch/sam2` @ `2b90b9f` into `third_party/sam2/` (`.git` removed); `pip install -e`
+    into `gd4d5090` (**`--no-build-isolation` + `TMPDIR=/workspace`** — build isolation was re-downloading
+    torch+CUDA onto the ~2 GB overlay `/` and ran out of space). Weights `sam2.1_hiera_large.pt` (857 MB,
+    Apache-2.0, sha256 `2647878d…`) → `checkpoints/sam2/`. **Verified: 23 clean per-object masks on a LIBERO goal frame.**
+  - Provenance: `third_party/README.md`, `checkpoints/README.md`; env note + refreshed lock (`env/`).
+  - **Plan S2 reshaped** (design doc §M0/S2): 4 **cheap** generators (cut-paste, TPS warp, mismatched-frame,
+    cross-episode composite) — SAM 2 masks only, no InstructPix2Pix; realistic dreamer+DINOv3 negatives deferred
+    to the S4 OOD gate (§5.2). Also recorded S4=supervised (§5.2).
+  - Files: `third_party/{sam2/,README.md}`, `checkpoints/{sam2/,README.md}`, `env/requirements-gd4d5090*.txt`, `GD-4D_implementation_plan.md`.
+
+- **M0/S1 finish: real LIBERO dataset adapter — S1 now builds tuples from real pixels.** `90770d7`
   - Implemented `src/data/adapters.py::LiberoTrajectory` (+ `iter_libero_episodes`): reads robomimic-format
     LIBERO HDF5, corrects the OpenGL vertical flip, pulls the instruction from `data.attrs['problem_info']`,
     supplies nominal pinhole intrinsics (fovy 45°) + placeholder extrinsic (backbone infers camera; exact
