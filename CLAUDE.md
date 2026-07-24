@@ -98,6 +98,11 @@ committed docs alone — no reliance on shell history or undocumented steps.** C
   purpose, the **verbatim commands** to reproduce it, the environment used, and the results
   (with the metric files / outputs alongside). A third person should be able to `cd` in and
   re-run it top to bottom.
+- **Visual outputs (MANDATORY):** whenever you produce ANY visual deliverable — a figure, montage,
+  gallery, GIF, or overlay (i.e. any time the user says "export/draw/render/visualize/plot" or you
+  otherwise emit an image) — record it in the relevant `README.md` / doc **in the same change**: the
+  **exact command** that regenerates it, the **output path**, and the **env**. The generating script
+  lives in the repo (never a throwaway), so a third person can reproduce the exact image. No undocumented figures.
 
 If a step isn't written down such that someone else can repeat it, it isn't done.
 

@@ -9,7 +9,16 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S2: implemented the 4 cheap corruption generators + SAM 2 mask provider.** _(HEAD — this change)_
+- **S2 example figures + "document visual outputs" rule.** _(HEAD — this change)_
+  - `experiments/S2_corruptions/export_examples.py` → `viz/examples_scene{1,2}.png`: per-generator
+    `original → corruption+region → 16×16 label`, two LIBERO scenes with varied objects.
+  - `experiments/S2_corruptions/README.md`: generators, overlays legend, and **verbatim reproduce commands**.
+  - `CLAUDE.md` §2.6: added a **MANDATORY visual-outputs rule** — any exported figure/montage/gallery/GIF
+    must be recorded in a README/doc (exact command + output path + env) in the same change, with the
+    generating script kept in the repo.
+  - Files: `experiments/S2_corruptions/{export_examples.py,README.md,viz/examples_scene{1,2}.png}`, `CLAUDE.md`.
+
+- **S2: implemented the 4 cheap corruption generators + SAM 2 mask provider.** `e1e71a2`
   - `src/data/corruptions.py`: `cut_paste` (remove/relocate/duplicate via mask + inpaint + copy-paste),
     `tps_warp` (TPS-style elastic warp localized to a mask), `mismatched_frame`, `cross_episode_composite`,
     and `region_to_patch_labels` (≥25%-overlap → 16×16 label). Generators take a mask from any source →
