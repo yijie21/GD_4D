@@ -9,7 +9,23 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **Vendored OpenD4RT backbone + added change-tracing rule.** _(HEAD — this change)_
+- **S0 backbone-sanity: downloaded 48CLIP weights, built the `gd4d5090` env, verified correspondence recovery.** _(HEAD — this change)_
+  - **Env:** created standalone conda env **`gd4d5090`** (Python 3.10). Installed **cu128** torch
+    (`torch 2.11.0+cu128`, `torchvision 0.26.0+cu128`) — deviating from OpenD4RT's `cu124` pin, which
+    does NOT run on the RTX 5090 (Blackwell sm_120: "no kernel image"). Verified a real CUDA kernel runs.
+    Docs: `env/README.md`, `env/requirements-gd4d5090.txt`, `env/requirements-gd4d5090.lock.txt`.
+  - **Weights:** downloaded `OpenD4RT_48CLIP_9Mix_NoCropAUG/opend4rt.ckpt` (13 GB, Apache-2.0,
+    sha256 `65936f72…`) from HF `Lijiaxin0111/OpenD4RT` into `checkpoints/`. Provenance in `checkpoints/README.md`.
+  - **Spike:** added `src/eval/s0_backbone_sanity.py` (identity / fwd–bwd cycle / calibration / overlay,
+    reusing the vendored query machinery). Ran on a HOT3D natural clip and a LIBERO manipulation clip.
+    **Result: PASS** — identity ~1–2 px, cycle ~2–5 px, well-calibrated visibility, zero-shot on manipulation.
+    ⚠️ raw `confidence` saturated (~1.0) → recorded as a design note for S4 (disagreement head).
+    Records + committed evidence: `experiments/S0_backbone_sanity/`.
+  - **Rule:** added `CLAUDE.md` §2.6 (reproducibility) + `env/` and `experiments/` to the directory table;
+    updated §3 (D0 resolved & validated). Files: `CLAUDE.md`, `README.md`, `checkpoints/README.md`,
+    `env/*`, `experiments/S0_backbone_sanity/*`, `src/eval/s0_backbone_sanity.py`, `GD-4D_implementation_plan.md`.
+
+- **Vendored OpenD4RT backbone + added change-tracing rule.** `fc9a7ac`
   - Copied `https://github.com/Lijiaxin0111/Open-d4rt.git` @ `bead824` into `third_party/Open-d4rt/`
     (`.git` removed; contents git-ignored). This **resolves Decision D0** — GD-4D's frozen 4D
     backbone (inventory #1) is OpenD4RT. Weights still to download from HF into `checkpoints/`.

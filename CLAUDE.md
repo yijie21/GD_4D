@@ -32,6 +32,8 @@ When implementing, work milestone by milestone in the plan and **keep the plan's
 | `src/` | **ALL of our own code lives here.** Nothing of ours goes outside `src/`. |
 | `third_party/` | **ANY external / cloned repo goes here** (`git clone` or submodule). Do not scatter clones elsewhere. Prefer wrapping vendored code over editing it in place. |
 | `checkpoints/` | **ALL downloaded model weights go here.** Never commit weights to git. |
+| `env/` | **Environment specs** — the conda env (`gd4d5090`) recreation guide + pinned requirements. |
+| `experiments/` | **Experiment records + outputs** (reports, overlays), one folder per experiment, each with a reproducible `README.md`. Not code (code is in `src/`), not weights. |
 | `data/` → `/workspace/datasets/gd_4d_data` | **ALL datasets are downloaded to `/workspace/datasets/gd_4d_data`** (outside the code tree), and referenced through the `data/` **symlink** in this repo (`data/` → that folder). Use `data/<dataset>/...` in code; never download datasets into the code tree, and never commit them. |
 
 Do **not** put code, clones, weights, or datasets anywhere else in the tree.
@@ -81,13 +83,36 @@ traced later:
 
 Do not land a change without a corresponding `CHANGELOG.md` entry.
 
-## 3. Open blocker before coding the bridge
+## 2.6 Reproducibility (MANDATORY)
 
-**Decision D0 (which 4D backbone) is unresolved and gates milestone M1 (and everything after).**
-Options (see plan §1.1): use **D4RT** if weights are obtainable, else adopt **SpatialTrackerV2**'s
-queryable-3D interface, adapt **VGGT/π³/CUT3R**, or train a reduced **D4RT-style** model.
-**Resolve D0 before implementing S3 (the bridge).** M0 (data pipeline) can start in parallel and does
-not depend on D0 — except that S2's label-scoring choice is Decision D1.
+**Every environment, download, and experiment must be reproducible by a third person from the
+committed docs alone — no reliance on shell history or undocumented steps.** Concretely:
+
+- **Environment:** the single conda env for this repo is **`gd4d5090`** (built for the RTX 5090 /
+  Blackwell — needs **cu128** torch, *not* OpenD4RT's cu124 pin). Any change to it (new package,
+  version bump) updates `env/README.md` + `env/requirements-gd4d5090*.txt` in the same change.
+- **Downloads** (weights, datasets): record the **exact command**, source URL, **sha256**, and
+  license in the relevant provenance log (`checkpoints/README.md`, `data/README.md`,
+  `third_party/README.md`) so the artifact can be re-fetched byte-for-byte.
+- **Experiments:** each lives under `experiments/<name>/` with a `README.md` that states the
+  purpose, the **verbatim commands** to reproduce it, the environment used, and the results
+  (with the metric files / outputs alongside). A third person should be able to `cd` in and
+  re-run it top to bottom.
+
+If a step isn't written down such that someone else can repeat it, it isn't done.
+
+## 3. Backbone status (D0 — RESOLVED & VALIDATED)
+
+**Decision D0 is resolved: the frozen 4D backbone is OpenD4RT** (`third_party/Open-d4rt`,
+48CLIP checkpoint in `checkpoints/`). It is not just present — **S0 (`experiments/S0_backbone_sanity/`)
+empirically confirmed correspondences are recoverable** (identity ~1–2 px, fwd–bwd cycle ~2–5 px,
+well-calibrated visibility) and that recovery **transfers zero-shot to manipulation** (LIBERO).
+So M1 (the bridge) is unblocked.
+
+⚠️ **Carry this finding into S4:** the checkpoint's raw `confidence` scalar is **saturated
+(~1.0 everywhere)** — non-discriminative. The disagreement head must derive `Dₜ` primarily from
+the **cycle residual `e_cyc`** and **visibility `v`** (and/or a computed confidence proxy), not
+raw confidence.
 
 ---
 

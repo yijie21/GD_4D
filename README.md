@@ -14,6 +14,8 @@ execution-time** quantities that gate the policy.
 | `src/` | Our code (`data/`, `models/{backbone,bridge,heads,policy}/`, `train/`, `eval/`, `configs/`). |
 | `third_party/` | Vendored external repos (e.g. OpenD4RT). Provenance in `third_party/README.md`. |
 | `checkpoints/` | Downloaded weights (git-ignored). Provenance in `checkpoints/README.md`. |
+| `env/` | Conda env (`gd4d5090`) recreation guide + pinned requirements. |
+| `experiments/` | Experiment records + outputs, each with a reproducible `README.md`. |
 | `data/` → `/workspace/datasets/gd_4d_data` | Datasets (symlink; git-ignored). |
 
 Design docs (the spec for *what* to build) live in `/workspace/research/d4rt/`:
@@ -22,13 +24,20 @@ Design docs (the spec for *what* to build) live in `/workspace/research/d4rt/`:
 ## Status
 
 - **M0 · S1 (build tuples)** — ✅ done. **M0 · S2 (corrupt & label)** — next.
-- **D0 (backbone)** — resolved: **OpenD4RT** vendored in `third_party/Open-d4rt/` (weights TBD from HF).
+- **D0 (backbone)** — ✅ resolved **and validated**: **OpenD4RT** vendored in `third_party/Open-d4rt/`,
+  48CLIP weights downloaded, and **S0 confirmed correspondences are recoverable** (identity ~1–2 px,
+  fwd–bwd cycle ~2–5 px, zero-shot on manipulation) → M1 unblocked. See `experiments/S0_backbone_sanity/`.
+  ⚠️ Raw `confidence` is saturated → S4 must lean on cycle residual + visibility, not raw confidence.
+- **Env** — standalone conda env **`gd4d5090`** (cu128 torch for RTX 5090). See `env/README.md`.
 - See `CHANGELOG.md` for the full trace and the plan for milestone specs.
 
-## Run the tests
+## Environment & tests
 
 ```bash
-source /venv/main/bin/activate
+# GD-4D env (backbone + our code) — see env/README.md to (re)create it
+/workspace/miniconda3/envs/gd4d5090/bin/python -c "import torch; print(torch.__version__)"
+
+# unit tests (torch-agnostic data code)
 cd /workspace/code/GD_4D
-pytest            # pythonpath=src, testpaths=src (see pyproject.toml)
+/workspace/miniconda3/envs/gd4d5090/bin/python -m pytest   # pythonpath=src, testpaths=src
 ```

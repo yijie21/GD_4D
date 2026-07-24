@@ -1,0 +1,22 @@
+# GD-4D env `gd4d5090` — intent-level requirements (Python 3.10).
+# For EXACT reproducible pins see requirements-gd4d5090.lock.txt.
+#
+# IMPORTANT (Blackwell / RTX 5090, compute capability 12.0):
+#   torch/torchvision MUST come from the cu128 index. The repo's cu124 pin installs
+#   but fails at runtime with "no kernel image is available". Install torch with:
+#     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#
+# torch==2.11.0+cu128          # from cu128 index (see above)
+# torchvision==0.26.0+cu128    # from cu128 index (see above)
+
+PyYAML==6.0.3
+opencv-python-headless==4.13.0.92
+imageio==2.37.3
+matplotlib==3.10.8
+tqdm==4.67.3
+tensorboard==2.20.0
+lz4==4.4.5
+numpy==2.2.6
+huggingface_hub[cli]
+h5py
+pytest
