@@ -9,7 +9,19 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **M1: full distillation run (bidirectional + all offsets + checkpointing) — machinery complete, gate not yet passed.** _(HEAD — this change)_
+- **⭐ Premise test: generated dreams are NOT detectable by the backbone's self-consistency (reshapes the disagreement mechanism).** _(HEAD — this change)_
+  - Installed InstructPix2Pix (diffusers/transformers/accelerate; weights → HF cache on /workspace).
+    `experiments/M1_generated_dream_premise/premise.py`: generate dreams from `o_t`+instruction, native-encode
+    `[obs,dream,dream]`, measure cycle error + visibility for real / hallucinated / preserved dreams.
+  - **Result:** all three ~identical (cycle 1.83/1.78/1.85 px; visibility ~0.99) — a hallucinated dream is
+    self-consistent but wrong. **Cycle consistency ≠ correctness** (same lesson as S0/S4). ⇒ absolute
+    cycle/visibility can't detect a wrong dream → the disagreement `Dₜ` must come from **dream↔observed
+    cross-consistency**, not the dream's own self-consistency (not yet designed). Also: **IP2P inadequate**
+    as a dreamer (hallucinate-or-copy) → need SuSIE/GR-MG.
+  - Recorded in plan progress log + memory (`disagreement-signal-constraint`). Core-mechanism decision pending.
+  - Files: `experiments/M1_generated_dream_premise/**`, `GD-4D_implementation_plan.md`.
+
+- **M1: full distillation run (bidirectional + all offsets + checkpointing) — machinery complete, gate not yet passed.** `1ea2020`
   - `distill.py` rewritten: bidirectional queries (o_t↔dream), dreams at all offsets j∈{5,10,15,20},
     per-sample `dream_j`, held-out **recall@3px** eval (the acceptance metric). `wrapper.py` gained
     **gradient checkpointing** (`use_checkpoint`) — fixed a GPU0 OOM (grads flow to LoRA through the whole
