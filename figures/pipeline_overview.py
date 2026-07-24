@@ -37,7 +37,8 @@ except Exception:
 C = {
     "validated": "#009E73",   # green
     "open":      "#E69F00",   # amber - built but question open
-    "falsified": "#D55E00",   # vermillion - falsified / blocked
+    "resolved":  "#0072B2",   # blue - de-risked, redefined -> build
+    "falsified": "#D55E00",   # vermillion - falsified idea (shown in callout only)
     "todo":      "#999999",   # gray - not started
     "input":     "#56B4E9",   # blue - data
 }
@@ -115,39 +116,39 @@ ax.text(99.6, YM + HM/2 + 2.4, "→ robot", ha="right", fontsize=8.5, color="#33
 # ---- bottom row: the two heads (read backbone, gate policy) -------------------
 YH, HH = 20, 18
 dt, dtb = box(ax, 49, YH, 18, HH, "Disagreement head  $D_t$",
-              "“how wrong is the dream?”", "falsified", "S4")
+              "learned critic on $(o_t,$ dream)\nDINOv3 appearance features", "resolved", "S4 · M4 ✓")
 tau, taub = box(ax, 71.5, YH, 15, HH, "Plan-position  $τ_t$",
                 "“where in the plan?”", "todo", "S5")
 
-# backbone -> heads (read)
-arrow(ax, (68, 52), (60, YH + HH), "reads", "#009E73", rad=-0.15, lab_dy=0.2, lab_fs=7.5)
+# Dt reads (o_t, dream) appearance feats (NOT backbone geometry); tau reads backbone
+arrow(ax, (46, 58.5), (55, YH + HH), "$o_t$, dream\nDINOv3 feats", "#0072B2", rad=0.18, lab_dy=0.4, lab_fs=7.2)
 arrow(ax, (74, 52), (79, YH + HH), "reads", "#009E73", rad=0.15, lab_dy=0.2, lab_fs=7.5)
 # heads -> policy (gate, dashed)
-arrow(ax, (dtb[1], YH + HH - 2), (88, YM - 0.3), "gate", "#D55E00", ls="--", rad=-0.25, lab_dy=0.2, lab_fs=7.8)
+arrow(ax, (dtb[1], YH + HH - 2), (88, YM - 0.3), "gate", "#0072B2", ls="--", rad=-0.25, lab_dy=0.2, lab_fs=7.8)
 arrow(ax, (taub[1], YH + HH), (89, YM - 0.3), "gate", "#777", ls="--", rad=-0.15, lab_dy=0.2, lab_fs=7.8)
 
 # closed loop (re-dream) — arcs cleanly ABOVE the top row
 arrow(ax, (88, 80), (31, 80), "closed loop: re-dream / re-plan  (S7)",
       "#888", ls=":", rad=0.22, lab_dy=3.6, lab_fs=8, lab_color="#666")
 
-# ---- callout on the falsified Dt ---------------------------------------------
+# ---- callout: Dt resolved (geometric route falsified -> learned critic) -------
 co = FancyBboxPatch((1.5, 1.5), 97, 12.5, boxstyle="round,pad=0.5,rounding_size=1.2",
-                    linewidth=2.2, edgecolor=C["falsified"], facecolor=tint(C["falsified"], 0.09), zorder=1)
+                    linewidth=2.2, edgecolor=C["resolved"], facecolor=tint(C["resolved"], 0.09), zorder=1)
 ax.add_patch(co)
-ax.text(3.5, 11.7, "✗  $D_t$ is FALSIFIED as a geometric read-out of the frozen backbone — the current crossroads",
-        ha="left", va="top", fontsize=10.5, fontweight="bold", color="#8a3d00")
-ax.text(3.5, 7.9,
-        "Three converging de-risks: M1 premise (a dream’s own self-consistency is identical for real / "
-        "hallucinated / copied goals) · M2 (on a real dreamer, confound-free\ngeometric delta AUROC 0.51 = chance) · "
-        "M3 (reference-free cross-consistency ≈1.0 on geometrically-broken goals but ~0.60 on a plausible-but-wrong "
-        "future).  The backbone finds coherent\ncorrespondences for ANY realistic image → geometry cannot answer "
-        "“is this the CORRECT dream”.   ⇒ $D_t$ must be LEARNED (a critic) or sourced elsewhere (dreamer / policy uncertainty).",
-        ha="left", va="top", fontsize=8.6, color="#5a2a00")
+ax.text(3.5, 11.9, "✓  $D_t$ resolved — the geometric read-out is falsified; $D_t$ is a LEARNED CRITIC (de-risked viable, M4)",
+        ha="left", va="top", fontsize=10.5, fontweight="bold", color="#0a4a72")
+ax.text(3.5, 8.4,
+        "M1/M2/M3 falsified the frozen-backbone GEOMETRIC signal (self/cross-consistency at chance on real dreams:\n"
+        "M2 delta 0.51, M3 ~0.60 on a plausible-but-wrong future).  M4: a learned critic on DINOv3 appearance "
+        "features of $(o_t,$ dream)\nseparates correct vs wrong goals at AUROC 0.83–0.98 and transfers to generated "
+        "dreams (0.78).   ⇒ $D_t$ = the plan’s S4-supervised\nappearance critic, NOT a backbone read-out; the frozen "
+        "backbone’s role narrows to dream-conditioning.   Open: within-scene wrongness (in progress).",
+        ha="left", va="top", fontsize=8.6, color="#123a52")
 
 # ---- status legend -----------------------------------------------------------
 lx, ly = 1.5, 87.0
 items = [("validated", "validated (S0)"), ("open", "built · question open (M1/M2)"),
-         ("falsified", "falsified / blocked (S4·Dₜ)"), ("todo", "not started (S5/S6/S7)")]
+         ("resolved", "de-risked → build (S4·Dₜ, M4)"), ("todo", "not started (S5/S6/S7)")]
 for i, (k, lab) in enumerate(items):
     x = lx + i * 24.5
     ax.add_patch(FancyBboxPatch((x, ly), 2.2, 2.2, boxstyle="round,pad=0.1,rounding_size=0.5",
