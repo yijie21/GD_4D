@@ -9,7 +9,16 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **M1: bridge (S3) LoRA-injection plumbing — weight-exact identity on the frozen backbone.** _(HEAD — this change)_
+- **M1: S3 distillation loop — student→teacher training runs and converges (GPU0, teacher-cached).** _(HEAD — this change)_
+  - `src/train/distill.py`: teacher = frozen backbone on the full real clip (28f, cached); student = bridge
+    on `[obs, dream, dream]` (10f — dream duplicated so the 2-frame temporal patching keeps it). Loss =
+    SmoothL1(xyz)+0.1·MSE(conf), Adam on the LoRA params only. Overfit-8-tuples smoke: **loss 0.045→0.008
+    (82% down)**, grads flow to LoRA. Records + loss curve in `experiments/M1_bridge_distill/` (per §2.6).
+  - Not yet active (next increments): imagined-time wiring into the encoder forward + dream-token gating +
+    bidirectional queries + the acceptance-recall gate.
+  - Files: `src/train/distill.py`, `experiments/M1_bridge_distill/`, `GD-4D_implementation_plan.md`.
+
+- **M1: bridge (S3) LoRA-injection plumbing — weight-exact identity on the frozen backbone.** `5a11a50`
   - `src/models/bridge/`: `lora.py` (gated, zero-init `LoRALinear` with teacher/student `enabled`),
     `attention.py` (`LoRAAttention.from_mha` — unpacks `nn.MultiheadAttention`'s packed QKV into
     weight-exact Q/K/V/O linears + LoRA), `imagined_time.py` (sinusoidal(j)→MLP), `wrapper.py`
