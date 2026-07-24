@@ -1,0 +1,52 @@
+{
+  "n_windows": 20,
+  "H": 10,
+  "auroc": {
+    "S_motion__vs__wrong_demo": 0.531,
+    "S_motion__vs__wrong_task": 0.598,
+    "S_motion__vs__shuffled": 0.861,
+    "S_motion__vs__blank": 0.688,
+    "S_bg__vs__wrong_demo": 0.595,
+    "S_bg__vs__wrong_task": 0.743,
+    "S_bg__vs__shuffled": 1.0,
+    "S_bg__vs__blank": 0.973,
+    "S_incomplete__vs__wrong_demo": 0.499,
+    "S_incomplete__vs__wrong_task": 0.579,
+    "S_incomplete__vs__shuffled": 0.704,
+    "S_incomplete__vs__blank": 0.203,
+    "S_selfcyc__vs__wrong_demo": 0.598,
+    "S_selfcyc__vs__wrong_task": 0.757,
+    "S_selfcyc__vs__shuffled": 1.0,
+    "S_selfcyc__vs__blank": 1.0
+  },
+  "medians": {
+    "S_motion": {
+      "correct": 6.82,
+      "wrong_demo": 7.09,
+      "wrong_task": 11.03,
+      "shuffled": 17.44,
+      "blank": 10.58
+    },
+    "S_bg": {
+      "correct": 1.26,
+      "wrong_demo": 1.35,
+      "wrong_task": 1.45,
+      "shuffled": 10.29,
+      "blank": 2.81
+    },
+    "S_incomplete": {
+      "correct": 0.02,
+      "wrong_demo": 0.02,
+      "wrong_task": 0.03,
+      "shuffled": 0.04,
+      "blank": 0.0
+    },
+    "S_selfcyc": {
+      "correct": 2.67,
+      "wrong_demo": 2.92,
+      "wrong_task": 3.3,
+      "shuffled": 16.74,
+      "blank": 7.13
+    }
+  }
+}

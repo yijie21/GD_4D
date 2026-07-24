@@ -9,7 +9,26 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **⭐⭐ M2: a real in-domain dreamer confirms the frozen backbone's self-consistency is BLIND to real dream errors.** _(HEAD — this change)_
+- **⭐⭐⭐ M3: cross-consistency de-risk falsifies the geometric-disagreement premise (3rd convergent negative).** _(HEAD — this change)_
+  - **Direction #2** (chosen): test reference-free signals that check the goal against the OBSERVED
+    WINDOW rather than itself — motion-continuation, background-rigidity, correspondence-completeness,
+    plus a self-cycle baseline. Obs window spaced at the goal horizon so motion extrapolation is well
+    defined (`derisk.py`). Negatives: `wrong_demo` (same task, plausible wrong future — same scene),
+    `wrong_task`, and `shuffled`/`blank` diagnostics.
+  - **Result:** the functional signals (S_bg, S_selfcyc) hit **AUROC ≈ 1.0 on geometrically-destroyed
+    goals** (shuffled/blank) — proving they are sensitive — but stay at **chance (~0.60 @H=10, ~0.40
+    @H=20) on `wrong_demo`**, the realistic plausible-but-wrong future. **Cross-consistency gave no
+    advantage over the self-consistency M1/M2 already showed is inadequate.** `S_incomplete` is
+    non-functional (visibility saturated — the S0 problem); `S_motion` is noise at long horizon.
+  - **⇒ Reference-free GEOMETRIC consistency (self OR cross) over the frozen backbone detects only
+    broken images, not the semantically-wrong-but-coherent dreams a real dreamer produces.** Three
+    de-risks (M1/M2/M3) converge and **falsify the core premise** that the frozen 4D backbone supplies
+    the disagreement `Dₜ` via geometric consistency. Dₜ must be **learned** (semantic/dynamics critic)
+    or the mechanism **rethought** (dreamer self-uncertainty; policy uncertainty; drop the gate).
+  - Recorded in plan progress log + memory (`disagreement-signal-constraint`). **Strategic decision forced.**
+  - Files: `experiments/M3_cross_consistency/**`, `GD-4D_implementation_plan.md`.
+
+- **⭐⭐ M2: a real in-domain dreamer confirms the frozen backbone's self-consistency is BLIND to real dream errors.** `b2fecf0`
   - **Direction #1** (chosen): pull a real robot goal-dreamer, characterize its failures. Skipped native
     SuSIE (JAX/Flax-only + real-world WidowX domain gap, Blackwell-risky) and ran **SuSIE's recipe
     in-domain**: fine-tuned `timbrooks/instruct-pix2pix` on libero_spatial goal pairs (`data.py`,
