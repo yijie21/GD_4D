@@ -1,0 +1,11 @@
+{
+  "n_localized_tuples": 23,
+  "auroc_cycle_error": 0.5915345407329321,
+  "auroc_cycle_delta": 0.7754922035999023,
+  "auroc_invisibility": 0.764487167446537,
+  "mismatch_global": {
+    "n": 5,
+    "mean_cyc_clean": 5.283420906689571,
+    "mean_cyc_corrupt": 4.8047255615190805
+  }
+}

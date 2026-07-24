@@ -9,7 +9,17 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S2 example figures + "document visual outputs" rule.** _(HEAD — this change)_
+- **S4 disagreement de-risk (pre-M1): the mechanism works, and the feature must be relative.** _(HEAD — this change)_
+  - `src/eval/s4_disagreement_derisk.py`: native-encode `[obs…goal]` clips through the frozen backbone
+    (no bridge), per-patch cycle error on the goal, AUROC vs S2 label. Reuses S0 helpers + the generators.
+  - Result (`experiments/S4_disagreement_derisk/`): **cycle-error DELTA(corrupt−clean) AUROC 0.78,
+    visibility 0.76, absolute cycle 0.59** (arm-motion confound). Disagreement localizes corruptions →
+    **GO on M1**; feature must be **relative (clean→injected delta) + visibility**, not absolute — which
+    is exactly what the bridge's teacher/student distillation provides (validates the bridge design).
+  - README + committed evidence figure (per the §2.6 visual-outputs rule).
+  - Files: `src/eval/s4_disagreement_derisk.py`, `experiments/S4_disagreement_derisk/`, `GD-4D_implementation_plan.md`.
+
+- **S2 example figures + "document visual outputs" rule.** `68f09cb`
   - `experiments/S2_corruptions/export_examples.py` → `viz/examples_scene{1,2}.png`: per-generator
     `original → corruption+region → 16×16 label`, two LIBERO scenes with varied objects.
   - `experiments/S2_corruptions/README.md`: generators, overlays legend, and **verbatim reproduce commands**.
