@@ -9,7 +9,21 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **✅ M4: learned critic is VIABLE — the disagreement signal is salvageable (as a critic, not geometry).** _(HEAD — this change)_
+- **✅ M4 v2 + pipeline figure: the real Dₜ head (per-patch critic) catches within-scene errors and generalizes.** _(HEAD — this change)_
+  - Downloaded 4 LIBERO suites (spatial/object/goal/10). Built the plan's S4-supervised head on DINOv2
+    **patch** features (`critic_v2_patch.py`): S2 relocate/remove/tps corruptions as within-scene wrong
+    negatives (SAM2 masks, 16×16 labels); clean goals all-0 so the critic must separate a corruption-
+    change from a legitimate motion-change (arm/object) — the thing geometry couldn't.
+  - **Within-scene wrong-object AUROC 0.973** (cosine 0.79). Cross-suite OOD (train 3 / test held-out):
+    spatial 0.964, goal 0.992, 10 0.830, **object 0.749** (novel objects transfer less, ≈ cosine).
+  - **⇒ Dₜ = a learned per-patch semantic critic is validated** — catches within-scene wrong objects
+    where geometry (M1/M2/M3) was blind, and generalizes across most suites. Closes the M4-v1 caveat.
+  - Updated `fig0_pipeline_overview` status board: Dₜ recolored from falsified(red) → de-risked→build
+    (blue), reading DINOv3 appearance features (not backbone geometry); callout rewritten to the M4
+    resolution.
+  - Files: `experiments/M4_learned_critic/critic_v2_patch.py`, `figures/**`, `GD-4D_implementation_plan.md`.
+
+- **✅ M4: learned critic is VIABLE — the disagreement signal is salvageable (as a critic, not geometry).** `aa77f67`
   - After M1/M2/M3 falsified the *geometric* `Dₜ`, tested option A: a small learned critic over DINOv2
     semantic features of `(o_t, goal)` (`critic_derisk.py`).
   - **Q1 capability** (MLP probe, real-frame negatives, no obs/real-fake shortcut): diff_task AUROC

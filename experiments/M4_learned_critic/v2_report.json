@@ -1,0 +1,31 @@
+{
+  "n_windows": 96,
+  "within_dist_probe_auroc": 0.973,
+  "within_dist_cosine_auroc": 0.794,
+  "ood": {
+    "libero_spatial": {
+      "probe": 0.964,
+      "cosine": 0.798,
+      "n_patches": 12288,
+      "n_corrupt": 1056
+    },
+    "libero_object": {
+      "probe": 0.749,
+      "cosine": 0.776,
+      "n_patches": 12288,
+      "n_corrupt": 577
+    },
+    "libero_goal": {
+      "probe": 0.992,
+      "cosine": 0.777,
+      "n_patches": 12288,
+      "n_corrupt": 1078
+    },
+    "libero_10": {
+      "probe": 0.83,
+      "cosine": 0.8,
+      "n_patches": 12288,
+      "n_corrupt": 666
+    }
+  }
+}

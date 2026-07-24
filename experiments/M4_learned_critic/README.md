@@ -52,13 +52,41 @@ suggestive but partly a domain confound (dreams look "generated").
 on D1 DINOv3 features), **not** a geometric read-out of the frozen backbone. The backbone's validated
 role narrows to **dream-conditioning for the policy** (its real strength), not supplying `Dₜ`.
 
+## v2 — the real Dₜ head: per-patch critic, within-scene errors, cross-suite OOD
+
+`critic_v2_patch.py` closes the v1 caveat. Downloaded **4 suites** (spatial / object / goal / 10) and
+built the plan's **S4-supervised head on DINOv2 PATCH features**: genuinely-wrong same-scene negatives
+= S2 corruptions (relocate / remove / tps of the real goal via SAM2 masks) with 16×16 patch labels;
+per-patch feature `[dino_patch(goal), dino_patch(goal) − dino_patch(o_t)]`; clean goals contribute
+all-0 so the critic must separate a **corruption-change** from a **legitimate motion-change** (arm /
+object legitimately moving) — the exact thing geometry (M1/M2/M3) could not do.
+
+| test | probe AUROC | cosine baseline |
+|---|---|---|
+| **within-scene wrong-object** (held-out demos, all suites) | **0.973** | 0.794 |
+| OOD — held-out `libero_spatial` | 0.964 | 0.798 |
+| OOD — held-out `libero_goal` | 0.992 | 0.777 |
+| OOD — held-out `libero_10` | 0.830 | 0.800 |
+| OOD — held-out `libero_object` | **0.749** | 0.776 |
+
+**The learned patch critic detects within-scene wrong objects at 0.97** — where geometry was at
+chance — and generalizes across most unseen suites (0.83–0.99). **Weak spot: novel objects**
+(`libero_object` held out → 0.75, ≈ the cosine baseline): the critic transfers less to object
+appearances it never saw in training. Mitigations: train on more suites (libero_90), DINOv3 features,
+or accept object-novelty as an inherent gap.
+
+**Verdict (M4 overall):** the disagreement head `Dₜ` = a **learned per-patch critic on semantic
+(DINOv2/DINOv3) features** is validated — separates correct/wrong goals (CLS 0.83–0.98), catches
+within-scene wrong objects (patch 0.97), and generalizes across suites (0.75–0.99). This is the plan's
+S4-supervised head on D1 appearance features. Geometry supplies nothing here; the frozen backbone's
+role is dream-conditioning for the policy.
+
 ### Open (honest scope)
-- Q2 tests **scene-fit**; **within-scene fine-grained** correctness (a coherent dream with the object
-  in the *wrong place*, same scene) was not cleanly testable — libero_spatial's low task diversity
-  (all "pick black bowl → place on plate") makes a same-scene *wrong* dream ≈ a correct one. Needs a
-  more diverse suite (libero_object/goal/10) or patch-level features to localize the error.
-- The critic uses global CLS; **patch features** (localizing a wrong object) are the natural next step
-  and align with D1's patch-cosine design.
+- OOD to genuinely **novel objects** transfers less (0.75) — needs broader training suites or DINOv3.
+- Negatives are S2 **synthetic** corruptions; a direct test on a diverse real dreamer's within-scene
+  errors is still ideal (blocked by the low-diversity libero_spatial dreamer — retrain the dreamer on
+  all 4 suites to close this).
+- Next: swap DINOv2→DINOv3 (D1), fold the critic into the S4 head, wire `Dₜ` into the policy gate.
 
 ## Reproduce (env `gd4d5090`, GPU0)
 ```bash
