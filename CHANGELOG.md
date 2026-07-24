@@ -9,7 +9,18 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S4 de-risk: added direct separability visuals (ROC + score distribution + label-overlaid heatmaps).** _(HEAD — this change)_
+- **M1: bridge (S3) LoRA-injection plumbing — weight-exact identity on the frozen backbone.** _(HEAD — this change)_
+  - `src/models/bridge/`: `lora.py` (gated, zero-init `LoRALinear` with teacher/student `enabled`),
+    `attention.py` (`LoRAAttention.from_mha` — unpacks `nn.MultiheadAttention`'s packed QKV into
+    weight-exact Q/K/V/O linears + LoRA), `imagined_time.py` (sinusoidal(j)→MLP), `wrapper.py`
+    (`D4RTBridge`: freeze backbone, swap all 40 encoder blocks, add imagined-time, teacher/student modes).
+  - Tests: `src/models/bridge/tests/test_bridge.py` (5, incl. exact MHA-match). Smoke:
+    `src/eval/m1_bridge_smoke.py` on OpenD4RT → **teacher & zero-init student reproduce the frozen memory
+    + query xyz bit-for-bit (max|Δ| = 0.00e0)**. 9.22 M trainable (0.79%).
+  - Next increments (M1): dream-token gating, teacher/student clip construction, distillation loop.
+  - Files: `src/models/{__init__.py,bridge/**}`, `src/eval/m1_bridge_smoke.py`, `GD-4D_implementation_plan.md`.
+
+- **S4 de-risk: added direct separability visuals (ROC + score distribution + label-overlaid heatmaps).** `954d441`
   - `s4_disagreement_derisk.py` now also emits `viz/s4_derisk_roc.png` (ROC for delta/visibility/absolute)
     and `viz/s4_derisk_distribution.png` (clean vs corrupted delta histogram, n=5041 vs 847 patches, median
     0.00→1.00 px); example heatmaps now overlay the S2 label outline (cyan). Documented in the S4 README.
