@@ -1,0 +1,170 @@
+{
+  "n_items_scored": 20,
+  "pooled_auroc_abs_cyc": 0.8598902894491129,
+  "pooled_auroc_cyc_delta": 0.5082364612511672,
+  "pooled_auroc_invis": 0.8724947478991597,
+  "pooled_auroc_invis_delta": 0.45876809056956114,
+  "mean_corr_delta_pixelerr": -0.0015298371583995275,
+  "per_item": [
+    {
+      "i": 0,
+      "task": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.4583333333333333,
+      "auroc_abs": 0.49503968253968256,
+      "corr_delta_pixelerr": 0.01743409381380903,
+      "n_wrong_patches": 4
+    },
+    {
+      "i": 1,
+      "task": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.7062937062937062,
+      "auroc_abs": 0.8576146076146076,
+      "corr_delta_pixelerr": 0.17048210859455382,
+      "n_wrong_patches": 22
+    },
+    {
+      "i": 2,
+      "task": "pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.5611338797814208,
+      "auroc_abs": 0.951844262295082,
+      "corr_delta_pixelerr": 0.12299428913276583,
+      "n_wrong_patches": 12
+    },
+    {
+      "i": 3,
+      "task": "pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.3866601033718927,
+      "auroc_abs": 0.8454344080728525,
+      "corr_delta_pixelerr": 0.0034555063560191674,
+      "n_wrong_patches": 17
+    },
+    {
+      "i": 4,
+      "task": "pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.6605710020526218,
+      "auroc_abs": 0.8701250233252472,
+      "corr_delta_pixelerr": 0.17126397655180153,
+      "n_wrong_patches": 23
+    },
+    {
+      "i": 5,
+      "task": "pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.5594395280235989,
+      "auroc_abs": 0.8797935103244838,
+      "corr_delta_pixelerr": 0.30298224532243617,
+      "n_wrong_patches": 30
+    },
+    {
+      "i": 6,
+      "task": "pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.5996527777777778,
+      "auroc_abs": 0.8478009259259259,
+      "corr_delta_pixelerr": 0.10614906437778443,
+      "n_wrong_patches": 40
+    },
+    {
+      "i": 7,
+      "task": "pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.512071463061323,
+      "auroc_abs": 0.9177933365523901,
+      "corr_delta_pixelerr": -0.0626055954484107,
+      "n_wrong_patches": 38
+    },
+    {
+      "i": 8,
+      "task": "pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.41517062914442826,
+      "auroc_abs": 0.8355167394468704,
+      "corr_delta_pixelerr": -0.12476041999623574,
+      "n_wrong_patches": 27
+    },
+    {
+      "i": 9,
+      "task": "pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.5486622073578595,
+      "auroc_abs": 0.890133779264214,
+      "corr_delta_pixelerr": 0.11260976937563341,
+      "n_wrong_patches": 26
+    },
+    {
+      "i": 10,
+      "task": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.4146666666666667,
+      "auroc_abs": 0.6993333333333334,
+      "corr_delta_pixelerr": -0.29436180864124045,
+      "n_wrong_patches": 6
+    },
+    {
+      "i": 11,
+      "task": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.44246031746031744,
+      "auroc_abs": 0.8244047619047619,
+      "corr_delta_pixelerr": -0.22233783887699315,
+      "n_wrong_patches": 4
+    },
+    {
+      "i": 12,
+      "task": "pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.6963118580765639,
+      "auroc_abs": 0.7829131652661064,
+      "corr_delta_pixelerr": 0.1218465243684312,
+      "n_wrong_patches": 18
+    },
+    {
+      "i": 13,
+      "task": "pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.3145484949832776,
+      "auroc_abs": 0.9041806020066889,
+      "corr_delta_pixelerr": -0.18921175085723843,
+      "n_wrong_patches": 26
+    },
+    {
+      "i": 14,
+      "task": "pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.42355371900826444,
+      "auroc_abs": 0.8503541912632822,
+      "corr_delta_pixelerr": -0.054383502324501,
+      "n_wrong_patches": 14
+    },
+    {
+      "i": 15,
+      "task": "pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.3734827264239029,
+      "auroc_abs": 0.8130252100840336,
+      "corr_delta_pixelerr": -0.10533491880058485,
+      "n_wrong_patches": 18
+    },
+    {
+      "i": 16,
+      "task": "pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.3518672199170125,
+      "auroc_abs": 0.83015214384509,
+      "corr_delta_pixelerr": -0.11288318219228319,
+      "n_wrong_patches": 15
+    },
+    {
+      "i": 17,
+      "task": "pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.04780876494023904,
+      "auroc_abs": 0.9681274900398407,
+      "corr_delta_pixelerr": -0.1155746594203179,
+      "n_wrong_patches": 5
+    },
+    {
+      "i": 18,
+      "task": "pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.6511761331038439,
+      "auroc_abs": 0.9099254159495124,
+      "corr_delta_pixelerr": 0.06993237709480742,
+      "n_wrong_patches": 7
+    },
+    {
+      "i": 19,
+      "task": "pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate_demo",
+      "auroc_delta": 0.3780241935483871,
+      "auroc_abs": 0.9455645161290323,
+      "corr_delta_pixelerr": 0.05170697840177292,
+      "n_wrong_patches": 8
+    }
+  ]
+}

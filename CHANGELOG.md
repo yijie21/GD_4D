@@ -9,7 +9,28 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **⭐ Premise test: generated dreams are NOT detectable by the backbone's self-consistency (reshapes the disagreement mechanism).** _(HEAD — this change)_
+- **⭐⭐ M2: a real in-domain dreamer confirms the frozen backbone's self-consistency is BLIND to real dream errors.** _(HEAD — this change)_
+  - **Direction #1** (chosen): pull a real robot goal-dreamer, characterize its failures. Skipped native
+    SuSIE (JAX/Flax-only + real-world WidowX domain gap, Blackwell-risky) and ran **SuSIE's recipe
+    in-domain**: fine-tuned `timbrooks/instruct-pix2pix` on libero_spatial goal pairs (`data.py`,
+    450/50 demo split; `train.py`, 10k steps, GPU0, **loss 0.064→0.025**).
+  - The dreamer does **real scene-preserving goal edits** (unlike raw IP2P). Failures: global appearance
+    drift (tone/vignette) + coherent-but-wrong arm/object pose (`characterize.py` → `dream_failure_gallery.png`).
+  - **⭐ Decisive test** (`s4_on_dreams.py`, 20 items ~5k patches, replays the S4 machinery on generated
+    dreams vs real goals): confound-free **cycle-error DELTA AUROC = 0.51 (chance)**; abs cycle 0.86 /
+    invisibility 0.87 are the **arm-tracking-hardness confound** (the label lives on the intrinsically
+    hard-to-track arm; the real-goal clip is the built-in correct-dream control, and delta≈0 proves abs
+    can't discriminate correct-vs-wrong).
+  - **Generalization:** S2 synthetic corruptions (cut-paste/tps) create a **local geometric inconsistency**
+    that S4 delta caught (0.78); real generative dreams are **globally coherent but semantically wrong** →
+    no such inconsistency → delta fails. **⇒ S2 corruptions are not representative of real dreamer failures;
+    a detector built on backbone self-consistency (abs OR relative-to-synthetic) will not transfer.** The
+    disagreement signal must be **cross-consistency** (dream vs what multiple observed frames imply) or a
+    **learned semantic critic** over dream+obs — not the frozen backbone's own cycle/visibility.
+  - Recorded in plan progress log + memory (`disagreement-signal-constraint`). **Core-mechanism decision forced.**
+  - Files: `experiments/M2_libero_dreamer/**`, `GD-4D_implementation_plan.md`.
+
+- **⭐ Premise test: generated dreams are NOT detectable by the backbone's self-consistency (reshapes the disagreement mechanism).** `2c71ea8`
   - Installed InstructPix2Pix (diffusers/transformers/accelerate; weights → HF cache on /workspace).
     `experiments/M1_generated_dream_premise/premise.py`: generate dreams from `o_t`+instruction, native-encode
     `[obs,dream,dream]`, measure cycle error + visibility for real / hallucinated / preserved dreams.
