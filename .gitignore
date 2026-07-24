@@ -30,6 +30,10 @@ runs/
 logs/
 *.log
 
+# --- experiment viz: keep PNG evidence; gifs + generated galleries are large & regenerable ---
+experiments/**/*.gif
+experiments/**/gallery.html
+
 # --- env / editor ---
 .venv/
 .env

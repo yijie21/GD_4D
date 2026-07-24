@@ -9,7 +9,18 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S0 backbone-sanity: downloaded 48CLIP weights, built the `gd4d5090` env, verified correspondence recovery.** _(HEAD — this change)_
+- **S0 correspondence visuals: match-lines / cycle / trails / animated tracks + published gallery.** _(HEAD — this change)_
+  - Added `src/eval/s0_visualize_correspondence.py` (reuses the S0 loaders) — renders source→target
+    match lines, forward→backward round-trip (visible-only, matching the metric), forward-track trails,
+    and animated GIFs, for HOT3D + LIBERO. Cycle figures filter to visible points so they can't
+    misrepresent (all-points median is dominated by out-of-frame points).
+  - Added `experiments/S0_backbone_sanity/build_gallery.py` → self-contained `viz/gallery.html`
+    (data-URI images), published as an Artifact:
+    https://claude.ai/code/artifact/489245ec-923b-4211-bacc-a77dafd47e8f
+  - `.gitignore`: commit `viz/**/*.png` evidence; ignore large regenerable `*.gif` + generated `gallery.html`.
+  - Files: `src/eval/s0_visualize_correspondence.py`, `experiments/S0_backbone_sanity/{build_gallery.py,README.md,viz/**}`, `.gitignore`.
+
+- **S0 backbone-sanity: downloaded 48CLIP weights, built the `gd4d5090` env, verified correspondence recovery.** `28c2f17`
   - **Env:** created standalone conda env **`gd4d5090`** (Python 3.10). Installed **cu128** torch
     (`torch 2.11.0+cu128`, `torchvision 0.26.0+cu128`) — deviating from OpenD4RT's `cu124` pin, which
     does NOT run on the RTX 5090 (Blackwell sm_120: "no kernel image"). Verified a real CUDA kernel runs.

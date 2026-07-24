@@ -34,6 +34,26 @@ clip (our target domain).
 Raw numbers + overlays are regenerable under `runs/<tag>/` (git-ignored); a committed snapshot
 of both runs' `report_*.json` + `overlay_*.png` is kept in [`evidence/`](evidence/) as proof.
 
+## Visuals — *see* the correspondences
+
+`src/eval/s0_visualize_correspondence.py` renders, per clip: **source→target match lines**,
+**forward→backward round-trip** (visible points, matching the metric), **forward tracks** (trails),
+and an **animated GIF**. Output → `viz/<clip>/` (committed as `viz/**/*.png`; the large `*.gif`
+and the generated `viz/gallery.html` are git-ignored — regenerate with the command below).
+
+- **Gallery (published):** https://claude.ai/code/artifact/489245ec-923b-4211-bacc-a77dafd47e8f
+- **Regenerate figures + gallery:**
+  ```bash
+  PY=/workspace/miniconda3/envs/gd4d5090/bin/python; CKPT=checkpoints/OpenD4RT_48CLIP_9Mix_NoCropAUG
+  $PY src/eval/s0_visualize_correspondence.py --config $CKPT/model.yaml --ckpt $CKPT/opend4rt.ckpt \
+     --video /workspace/datasets/hot3d/rc_input_001964_puzzle_toy/rgb.mp4 --grid 10 \
+     --out experiments/S0_backbone_sanity/viz/hot3d_puzzle_toy --tag hot3d
+  $PY src/eval/s0_visualize_correspondence.py --config $CKPT/model.yaml --ckpt $CKPT/opend4rt.ckpt \
+     --libero-hdf5 <libero.hdf5> --grid 10 \
+     --out experiments/S0_backbone_sanity/viz/libero_spatial_demo0 --tag libero
+  $PY experiments/S0_backbone_sanity/build_gallery.py   # -> viz/gallery.html (self-contained)
+  ```
+
 ## Reproduce
 
 Prereqs: the `gd4d5090` conda env (see [`../../env/README.md`](../../env/README.md)) and the
