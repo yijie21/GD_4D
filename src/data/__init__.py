@@ -4,6 +4,7 @@ S1 (build training tuples) is implemented here; S2 (corrupt & label) will be add
 """
 from __future__ import annotations
 
+from .adapters import LiberoTrajectory, iter_libero_episodes
 from .dataset import TupleDataset
 from .schema import TrainingTuple, TupleSpec, WindowConfig
 from .trajectory import SyntheticTrajectory, Trajectory
@@ -19,4 +20,6 @@ __all__ = [
     "build_tuple",
     "build_tuples",
     "TupleDataset",
+    "LiberoTrajectory",
+    "iter_libero_episodes",
 ]

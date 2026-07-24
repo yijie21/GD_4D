@@ -9,7 +9,18 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S0 correspondence visuals: match-lines / cycle / trails / animated tracks + published gallery.** _(HEAD — this change)_
+- **M0/S1 finish: real LIBERO dataset adapter — S1 now builds tuples from real pixels.** _(HEAD — this change)_
+  - Implemented `src/data/adapters.py::LiberoTrajectory` (+ `iter_libero_episodes`): reads robomimic-format
+    LIBERO HDF5, corrects the OpenGL vertical flip, pulls the instruction from `data.attrs['problem_info']`,
+    supplies nominal pinhole intrinsics (fovy 45°) + placeholder extrinsic (backbone infers camera; exact
+    calibration deferred to §3/D2). Previously all real adapters were `NotImplementedError` stubs — S1 had
+    only run on `SyntheticTrajectory`.
+  - Exposed LIBERO via the `data/libero` symlink (→ `/workspace/datasets/libero`); logged in `data/README.md`.
+  - Tests: added `src/data/tests/test_adapters_libero.py` (3 skip-guarded real-data tests) → **15 passing**.
+    End-to-end: one 98-frame episode → 18 tuples; 3-file×5-demo sweep → 343 tuples.
+  - This unblocks **S2** (which corrupts real reached-frames). Files: `src/data/{adapters.py,__init__.py,tests/test_adapters_libero.py}`, `data/README.md`, `GD-4D_implementation_plan.md`.
+
+- **S0 correspondence visuals: match-lines / cycle / trails / animated tracks + published gallery.** `f094718`
   - Added `src/eval/s0_visualize_correspondence.py` (reuses the S0 loaders) — renders source→target
     match lines, forward→backward round-trip (visible-only, matching the metric), forward-track trails,
     and animated GIFs, for HOT3D + LIBERO. Cycle figures filter to visible points so they can't
