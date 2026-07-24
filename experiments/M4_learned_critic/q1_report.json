@@ -1,0 +1,9 @@
+{
+  "n_windows": 1500,
+  "auroc_probe__diff_task": 0.976,
+  "auroc_cosine__diff_task": 0.806,
+  "auroc_probe__same_task": 0.833,
+  "auroc_cosine__same_task": 0.61,
+  "q2_auroc_dream_scene_pairing": 0.779,
+  "q2_realgoal_preferred_over_dream": 0.95
+}

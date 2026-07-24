@@ -9,7 +9,25 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **⭐⭐⭐ M3: cross-consistency de-risk falsifies the geometric-disagreement premise (3rd convergent negative).** _(HEAD — this change)_
+- **✅ M4: learned critic is VIABLE — the disagreement signal is salvageable (as a critic, not geometry).** _(HEAD — this change)_
+  - After M1/M2/M3 falsified the *geometric* `Dₜ`, tested option A: a small learned critic over DINOv2
+    semantic features of `(o_t, goal)` (`critic_derisk.py`).
+  - **Q1 capability** (MLP probe, real-frame negatives, no obs/real-fake shortcut): diff_task AUROC
+    **0.976**, same_task **0.833** — far above geometry (~0.6) and cosine (0.81/0.61). A linear probe
+    scored below-chance (linearity artifact; cosine needs the Δ-norm — the MLP fixes it).
+  - **Q2 OOD gate** (critic trained ONLY on real frames, applied to M2 generated dreams): dream-fits-
+    this-scene **AUROC 0.779** (both sides generated → clean transfer); real goal preferred over the
+    dream 19/20.
+  - **⇒ `Dₜ` should be a LEARNED critic on appearance/semantic features — exactly the plan's
+    S4-supervised head on D1 DINOv3 features — NOT a geometric read-out of the frozen backbone.** The
+    backbone's validated role narrows to dream-conditioning for the policy. Open: within-scene
+    fine-grained wrongness untestable on homogeneous libero_spatial (needs libero_object/goal/10 +
+    patch features).
+  - Recorded in plan progress log + memory. Reconciles the M1/M2/M3 negatives: geometric-freebie dead,
+    supervised-appearance-critic path alive.
+  - Files: `experiments/M4_learned_critic/**`, `GD-4D_implementation_plan.md`.
+
+- **⭐⭐⭐ M3: cross-consistency de-risk falsifies the geometric-disagreement premise (3rd convergent negative).** `68e70df`
   - **Direction #2** (chosen): test reference-free signals that check the goal against the OBSERVED
     WINDOW rather than itself — motion-continuation, background-rigidity, correspondence-completeness,
     plus a self-cycle baseline. Obs window spaced at the goal horizon so motion extrapolation is well
