@@ -198,6 +198,8 @@ def main() -> int:
     out = Path(args.out); (out / "viz").mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(json.dumps(report, indent=2))
     _save_examples(examples, out / "viz" / "s4_derisk_examples.png")
+    _save_roc(local, out / "viz" / "s4_derisk_roc.png")
+    _save_distribution(local, out / "viz" / "s4_derisk_distribution.png")
     print(json.dumps(report, indent=2))
     return 0
 
@@ -213,16 +215,62 @@ def _save_examples(examples, path):
     for r, (frame, cyc, lab, ctype) in enumerate(examples):
         axes[r, 0].imshow(frame); axes[r, 0].set_ylabel(ctype, fontsize=10)
         im = axes[r, 1].imshow(cyc, cmap="magma"); fig.colorbar(im, ax=axes[r, 1], fraction=0.046)
+        axes[r, 1].contour(lab.astype(float), levels=[0.5], colors="cyan", linewidths=1.3)  # label outline
         axes[r, 2].imshow(lab, cmap="Greys_r")
         for c in range(3):
             axes[r, c].set_xticks([]); axes[r, c].set_yticks([])
         if r == 0:
             for c, t in enumerate(["corrupted goal", "cycle-error RISE vs clean (px)", "S2 label"]):
                 axes[r, c].set_title(t, fontsize=11)
-    fig.suptitle("S4 de-risk: the clean→corrupt cycle-error DELTA localizes the corruption", fontsize=12)
+    fig.suptitle("S4 de-risk: the clean→corrupt cycle-error DELTA localizes the corruption\n"
+                 "(cyan outline = S2 label)", fontsize=12)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
+
+
+def _roc_points(score, label):
+    label = label.astype(bool)
+    order = np.argsort(-score, kind="mergesort")
+    l = label[order]
+    tpr = np.concatenate([[0.0], np.cumsum(l) / max(label.sum(), 1)])
+    fpr = np.concatenate([[0.0], np.cumsum(~l) / max((~label).sum(), 1)])
+    return fpr, tpr
+
+
+def _save_roc(local, path):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(5.6, 5.3), dpi=120)
+    for key, name, col in [("delta", "cycle-error delta (corrupt−clean)", "#e45756"),
+                           ("invis", "1 − visibility", "#54a24b"),
+                           ("cyc", "absolute cycle error", "#4c78a8")]:
+        fpr, tpr = _roc_points(local[key], local["label"])
+        ax.plot(fpr, tpr, lw=2, color=col, label=f"{name}   AUROC {auroc(local[key], local['label']):.2f}")
+    ax.plot([0, 1], [0, 1], "k--", lw=1, alpha=0.4)
+    ax.set_xlabel("false positive rate"); ax.set_ylabel("true positive rate")
+    ax.set_aspect("equal"); ax.set_title("S4 de-risk — do corrupted patches rank above clean?")
+    ax.legend(loc="lower right", fontsize=9)
+    fig.tight_layout(); fig.savefig(path, bbox_inches="tight"); plt.close(fig)
+
+
+def _save_distribution(local, path):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    d, lab = local["delta"], local["label"].astype(bool)
+    bins = np.linspace(float(np.percentile(d, 1)), float(np.percentile(d, 99)), 40)
+    fig, ax = plt.subplots(figsize=(6.6, 4.0), dpi=120)
+    ax.hist(d[~lab], bins=bins, density=True, alpha=0.6, color="#4c78a8", label=f"clean patches (n={int((~lab).sum())})")
+    ax.hist(d[lab], bins=bins, density=True, alpha=0.6, color="#e45756", label=f"corrupted patches (n={int(lab.sum())})")
+    ax.axvline(np.median(d[~lab]), color="#4c78a8", ls="--", lw=1.5)
+    ax.axvline(np.median(d[lab]), color="#e45756", ls="--", lw=1.5)
+    ax.set_xlabel("cycle-error rise vs clean (px)"); ax.set_ylabel("density")
+    ax.set_title("Corrupted patches shift to higher disagreement\n"
+                 f"median: clean {np.median(d[~lab]):.2f}px → corrupted {np.median(d[lab]):.2f}px")
+    ax.legend()
+    fig.tight_layout(); fig.savefig(path, bbox_inches="tight"); plt.close(fig)
 
 
 if __name__ == "__main__":

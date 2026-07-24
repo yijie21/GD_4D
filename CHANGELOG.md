@@ -9,7 +9,13 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S4 disagreement de-risk (pre-M1): the mechanism works, and the feature must be relative.** _(HEAD — this change)_
+- **S4 de-risk: added direct separability visuals (ROC + score distribution + label-overlaid heatmaps).** _(HEAD — this change)_
+  - `s4_disagreement_derisk.py` now also emits `viz/s4_derisk_roc.png` (ROC for delta/visibility/absolute)
+    and `viz/s4_derisk_distribution.png` (clean vs corrupted delta histogram, n=5041 vs 847 patches, median
+    0.00→1.00 px); example heatmaps now overlay the S2 label outline (cyan). Documented in the S4 README.
+  - Files: `src/eval/s4_disagreement_derisk.py`, `experiments/S4_disagreement_derisk/{README.md,viz/*}`.
+
+- **S4 disagreement de-risk (pre-M1): the mechanism works, and the feature must be relative.** `6f90b2a`
   - `src/eval/s4_disagreement_derisk.py`: native-encode `[obs…goal]` clips through the frozen backbone
     (no bridge), per-patch cycle error on the goal, AUROC vs S2 label. Reuses S0 helpers + the generators.
   - Result (`experiments/S4_disagreement_derisk/`): **cycle-error DELTA(corrupt−clean) AUROC 0.78,

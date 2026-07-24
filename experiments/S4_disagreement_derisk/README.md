@@ -42,5 +42,12 @@ CKPT=checkpoints/OpenD4RT_48CLIP_9Mix_NoCropAUG
 # -> experiments/S4_disagreement_derisk/report.json + viz/s4_derisk_examples.png
 ```
 
-Figure `viz/s4_derisk_examples.png`: **corrupted goal | cycle-error rise vs clean | S2 label** — the
-delta lights up on the corrupted region (removed / relocated / duplicated object), matching the label.
+## Figures (`viz/`) — how to check it yourself
+
+| File | What it shows | Read it as |
+|---|---|---|
+| `s4_derisk_roc.png` | ROC curves for the 3 scores | delta (0.78) & visibility (0.76) bow well above the diagonal; absolute cycle (0.59) hugs it |
+| `s4_derisk_distribution.png` | histogram of the **delta** for clean vs corrupted patches (n=5041 vs 847) | clean spikes at 0 px; corrupted shifts right (median 0.00 → 1.00 px, long tail) — the separation *is* the confirmation |
+| `s4_derisk_examples.png` | per-example: corrupted goal · delta heatmap (cyan = S2 label outline) · label | the delta concentrates inside/near the label (imperfect per-example, statistically clear) |
+
+All three regenerate from the single command above.
