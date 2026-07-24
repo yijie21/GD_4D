@@ -9,7 +9,21 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **S2 setup: pulled SAM 2 (masks) + reshaped S2 to cheap negatives (no diffusion editor).** _(HEAD — this change)_
+- **S2: implemented the 4 cheap corruption generators + SAM 2 mask provider.** _(HEAD — this change)_
+  - `src/data/corruptions.py`: `cut_paste` (remove/relocate/duplicate via mask + inpaint + copy-paste),
+    `tps_warp` (TPS-style elastic warp localized to a mask), `mismatched_frame`, `cross_episode_composite`,
+    and `region_to_patch_labels` (≥25%-overlap → 16×16 label). Generators take a mask from any source →
+    testable without SAM 2/GPU.
+  - `src/data/sam2_masks.py`: `Sam2MaskGenerator` wrapping SAM2AutomaticMaskGenerator with a
+    foreground-object filter (area ∈ [0.3%, 15%], drop scene-spanning background — the table was the
+    largest raw mask). Heavy imports kept inside methods.
+  - Tests: `src/data/tests/test_corruptions.py` (8, pure-geometry) → **23 total passing**.
+  - Demo: `experiments/S2_corruptions/demo.py` on real LIBERO goal frames → committed montage
+    (`viz/corruptions_demo.png`): region ↔ patch labels align across all 4 types; object corruptions 34–54
+    patches, mismatch 256. Files: `src/data/{corruptions.py,sam2_masks.py,__init__.py,tests/test_corruptions.py}`,
+    `experiments/S2_corruptions/`, `GD-4D_implementation_plan.md`.
+
+- **S2 setup: pulled SAM 2 (masks) + reshaped S2 to cheap negatives (no diffusion editor).** `3d1005b`
   - Vendored `facebookresearch/sam2` @ `2b90b9f` into `third_party/sam2/` (`.git` removed); `pip install -e`
     into `gd4d5090` (**`--no-build-isolation` + `TMPDIR=/workspace`** — build isolation was re-downloading
     torch+CUDA onto the ~2 GB overlay `/` and ran out of space). Weights `sam2.1_hiera_large.pt` (857 MB,

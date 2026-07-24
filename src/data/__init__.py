@@ -5,6 +5,14 @@ S1 (build training tuples) is implemented here; S2 (corrupt & label) will be add
 from __future__ import annotations
 
 from .adapters import LiberoTrajectory, iter_libero_episodes
+from .corruptions import (
+    CorruptionSample,
+    cross_episode_composite,
+    cut_paste,
+    mismatched_frame,
+    region_to_patch_labels,
+    tps_warp,
+)
 from .dataset import TupleDataset
 from .schema import TrainingTuple, TupleSpec, WindowConfig
 from .trajectory import SyntheticTrajectory, Trajectory
@@ -22,4 +30,10 @@ __all__ = [
     "TupleDataset",
     "LiberoTrajectory",
     "iter_libero_episodes",
+    "CorruptionSample",
+    "region_to_patch_labels",
+    "cut_paste",
+    "tps_warp",
+    "mismatched_frame",
+    "cross_episode_composite",
 ]
