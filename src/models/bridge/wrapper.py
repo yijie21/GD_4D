@@ -61,9 +61,60 @@ class D4RTBridge(nn.Module):
     def num_trainable(self) -> int:
         return sum(p.numel() for p in self.trainable_parameters())
 
-    # delegate the queryable interface to the (now bridged) backbone
-    def encode_video(self, video, aspect_ratio=None):
-        return self.model.encode_video(video, aspect_ratio)
+    def _sinusoidal(self):
+        if getattr(self, "_sinu_fn", None) is None:
+            from src.model.utils import sinusoidal_position_embedding  # vendored (on sys.path at runtime)
+            self._sinu_fn = sinusoidal_position_embedding
+        return self._sinu_fn
+
+    def encode_video(self, video, aspect_ratio=None, dream_j=None):
+        """Bridge-controlled re-implementation of the encoder forward (mirrors the vendored one).
+
+        In **student** mode it (a) adds the imagined-time embedding to the dream tokens (the **last
+        temporal patch** — the caller must place the dream there) and (b) **gates** every block's LoRA
+        delta to those dream tokens, so observed frames stay bit-identical to the teacher. In **teacher**
+        mode LoRA is disabled and no imagined-time is added → the frozen backbone, exactly (identity test).
+        """
+        enc = self.model.encoder
+        extra = self.model._project_aspect_ratio_token(video=video, aspect_ratio=aspect_ratio)  # [B,1,C]|None
+        x = video.permute(0, 2, 1, 3, 4)
+        x = enc.patch_embed(x)
+        x = enc._token_cap(x)
+        b, c, tp, hp, wp = x.shape
+        spatial, N = hp * wp, tp * hp * wp
+        dream_start = (tp - 1) * spatial
+        tokens = x.flatten(2).transpose(1, 2)
+        tokens = tokens + self._sinusoidal()(N, enc.hidden_dim, tokens.device).unsqueeze(0)
+
+        student = self.mode == "student"
+        if student and dream_j is not None:                # add imagined-time to the dream tokens only
+            j = torch.full((b,), float(dream_j), device=tokens.device)
+            mask = torch.zeros(b, N, 1, device=tokens.device, dtype=tokens.dtype)
+            mask[:, dream_start:, :] = 1.0
+            tokens = tokens + mask * self.imagined_time(j).to(tokens.dtype)[:, None, :]
+
+        if student:                                        # gate LoRA to the dream tokens
+            g_vid = torch.zeros(b, N, 1, device=tokens.device, dtype=tokens.dtype)
+            g_vid[:, dream_start:, :] = 1.0
+            g_local = g_vid.reshape(b, tp, spatial, 1).reshape(b * tp, spatial, 1)
+            g_global = (g_vid if extra is None else
+                        torch.cat([g_vid, torch.zeros(b, extra.shape[1], 1, device=tokens.device, dtype=tokens.dtype)], 1))
+
+        extra_tokens = extra
+        for mode, block in zip(enc.block_modes, enc.blocks):
+            block.attn.set_gate((g_local if mode == "local" else g_global) if student else None)
+            if mode == "local":
+                loc = tokens.reshape(b, tp, spatial, c).reshape(b * tp, spatial, c)
+                loc = block(loc)
+                tokens = loc.reshape(b, tp, spatial, c).reshape(b, N, c)
+            elif extra_tokens is None:
+                tokens = block(tokens)
+            else:
+                merged = block(torch.cat([tokens, extra_tokens], dim=1))
+                tokens, extra_tokens = merged[:, :N], merged[:, N:]
+
+        encoded = tokens if extra_tokens is None else torch.cat([tokens, extra_tokens], dim=1)
+        return self.model.memory_proj(enc.final_norm(encoded))
 
     def decode_queries(self, video, query, memory):
         return self.model.decode_queries(video, query, memory)

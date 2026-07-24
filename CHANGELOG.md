@@ -9,7 +9,16 @@ Format: `YYYY-MM-DD · <area>` — what changed, why, files/dirs, git commit (sh
 
 ## 2026-07-24
 
-- **M1: S3 distillation loop — student→teacher training runs and converges (GPU0, teacher-cached).** _(HEAD — this change)_
+- **M1: wired imagined-time + dream-token gating into the bridge (identity preserved).** _(HEAD — this change)_
+  - `wrapper.py::encode_video` is now a **bridge-controlled re-implementation of the encoder forward**
+    (mirrors the vendored one; **identity smoke still 0.00e0**). In student mode it adds the imagined-time
+    embedding to the dream tokens and **gates** each block's LoRA delta to the dream's **last temporal
+    patch** (local/global reshape-aware) → observed frames stay bit-identical to the teacher.
+  - `distill.py` now encodes the student with `dream_j=n` and trains LoRA + imagined-time. Overfit-8
+    residual improved **0.0083 → 0.0068** with both active.
+  - Files: `src/models/bridge/wrapper.py`, `src/train/distill.py`, `experiments/M1_bridge_distill/README.md`, `GD-4D_implementation_plan.md`.
+
+- **M1: S3 distillation loop — student→teacher training runs and converges (GPU0, teacher-cached).** `e245ffc`
   - `src/train/distill.py`: teacher = frozen backbone on the full real clip (28f, cached); student = bridge
     on `[obs, dream, dream]` (10f — dream duplicated so the 2-frame temporal patching keeps it). Loss =
     SmoothL1(xyz)+0.1·MSE(conf), Adam on the LoRA params only. Overfit-8-tuples smoke: **loss 0.045→0.008

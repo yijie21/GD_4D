@@ -55,7 +55,7 @@ def grid_uv(n_side=24, m=0.08):
     return np.stack(np.meshgrid(xs, xs, indexing="xy"), -1).reshape(-1, 2)
 
 
-def query(bridge, video_b, aspect_b, uv, t_src, t_tgt):
+def query(bridge, video_b, aspect_b, uv, t_src, t_tgt, dream_j=None):
     B, M, dev = video_b.shape[0], uv.shape[0], video_b.device
     u = torch.as_tensor(uv[:, 0], dtype=torch.float32, device=dev).view(1, M).expand(B, M).contiguous()
     v = torch.as_tensor(uv[:, 1], dtype=torch.float32, device=dev).view(1, M).expand(B, M).contiguous()
@@ -63,7 +63,7 @@ def query(bridge, video_b, aspect_b, uv, t_src, t_tgt):
          "t_src": torch.full((B, M), t_src, dtype=torch.long, device=dev),
          "t_tgt": torch.full((B, M), t_tgt, dtype=torch.long, device=dev),
          "t_cam": torch.full((B, M), T_CAM, dtype=torch.long, device=dev)}
-    mem = bridge.encode_video(video_b, aspect_b)
+    mem = bridge.encode_video(video_b, aspect_b, dream_j=dream_j)   # imagined-time on dream tokens (student)
     pred = bridge.decode_queries(video_b, q, mem)
     return pred["xyz_3d"], pred["confidence"]               # [B,M,3], [B,M]
 
@@ -113,15 +113,15 @@ def main() -> int:
     xyz_t = torch.cat(xyz_t); conf_t = torch.cat(conf_t)      # [N,M,3], [N,M]
     print(f"teacher cached: xyz {tuple(xyz_t.shape)}  (ref0 3D targets)")
 
-    # --- train student ---
+    # --- train student (LoRA + imagined-time; delta gated to dream tokens) ---
     bridge.set_mode("student")
-    params = [p for la in bridge.attns for p in la.lora_parameters()]
+    params = list(bridge.trainable_parameters())            # LoRA A/B + imagined-time MLP
     opt = torch.optim.Adam(params, lr=args.lr)
     losses = []
     for step in range(args.steps):
         idx = np.random.default_rng(step).choice(N, size=min(args.batch, N), replace=False)
         vb = to_video(stud_np[idx], device)
-        x_s, c_s = query(bridge, vb, aspect(vb.shape[0]), uv, T_SRC, TGT_STUDENT)
+        x_s, c_s = query(bridge, vb, aspect(vb.shape[0]), uv, T_SRC, TGT_STUDENT, dream_j=float(cfg.n))
         tgt_x = xyz_t[idx].to(device); tgt_c = conf_t[idx].to(device)
         loss = F.smooth_l1_loss(x_s, tgt_x) + 0.1 * F.mse_loss(c_s, tgt_c)
         opt.zero_grad(); loss.backward(); opt.step()

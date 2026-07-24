@@ -3,14 +3,18 @@
 Trains the LoRA bridge so the **student** (observed frames + dream) reproduces the **teacher** (full real
 clip) query outputs. GPU0 only, teacher targets cached.
 
-## Result — training machinery validated
+## Result — training machinery validated (imagined-time + gating active)
 
-Overfit 8 LIBERO tuples, 60 steps: distill loss **0.045 → 0.008 (82% down)**; gradients flow to the LoRA
-adapters; the student converges toward the teacher. Figure: `viz/distill_loss.png`.
+Overfit 8 LIBERO tuples, 60 steps: distill loss **0.046 → 0.0068 (85% down)**; gradients flow to the LoRA
++ imagined-time params; the student converges toward the teacher. Figure: `viz/distill_loss.png`.
 
-*Not yet active (next increments):* imagined-time wiring into the encoder forward + dream-token gating.
-The residual ~0.008 loss is what those should reduce — this increment proves the loop, cache, loss, and
-backprop, not final quality.
+**Imagined-time + dream-token gating are wired** (`wrapper.py::encode_video`, a bridge-controlled
+re-implementation of the encoder forward — identity still `0.00e0`): the imagined-time embedding is added
+to the dream tokens, and the student LoRA delta is **gated to the dream's last temporal patch** so
+observed frames stay bit-identical to the teacher. (Turning them on cut the residual 0.0083 → 0.0068.)
+
+*Still a machinery/overfit check, not a generalization run.* Next: bidirectional queries + all offsets
+j∈[1,n], then a real run + the acceptance-recall gate.
 
 ## Design
 
