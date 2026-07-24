@@ -1,0 +1,12 @@
+# S1 sliding-window config (plan §M0/S1). Mirrors data.schema.WindowConfig defaults.
+window:
+  h: 8        # observation-history length: frames [t-h+1 .. t]
+  n: 20       # sub-goal horizon: the goal is frame t+n
+  stride: 4   # step between successive current-times t
+
+# Datasets are referenced via the repo `data/` symlink -> /workspace/datasets/gd_4d_data.
+# Adapters (to implement) live in src/data/adapters.py.
+datasets:
+  calvin:    { root: data/calvin,    splits: [A, B, C, D] }
+  libero:    { root: data/libero,    suites: [spatial, object, goal, long] }
+  bridge_v2: { root: data/bridge_v2, static_camera_only: true }

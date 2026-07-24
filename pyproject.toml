@@ -1,0 +1,18 @@
+[project]
+name = "gd4d"
+version = "0.0.1"
+description = "Grounded Dreaming (GD-4D): goal-image-conditioned policy on a queryable 4D backbone"
+requires-python = ">=3.10"
+
+# Core deps are installed into the shared venv (/venv/main); this file mainly configures
+# tooling. Heavy deps (torch, diffusers, segment-anything, dinov2) are added per milestone.
+dependencies = [
+    "numpy",
+]
+
+[tool.pytest.ini_options]
+# Put src/ on the import path so tests use `from data.xxx import ...`.
+pythonpath = ["src"]
+testpaths = ["src"]
+python_files = ["test_*.py"]
+addopts = "-q"
